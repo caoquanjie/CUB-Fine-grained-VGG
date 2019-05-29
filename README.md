@@ -10,7 +10,7 @@ In this repository, I train a pretrained VGG model in tensorflow and the accurac
 ## Requirements
 python 3.6</br>
 tensorflow 1.4.0</br>
-numpy 1.15.0
+numpy 1.15.0</br>
 matplotlib 2.0.0
 
 ## Training details

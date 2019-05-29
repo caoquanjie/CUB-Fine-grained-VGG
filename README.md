@@ -4,7 +4,7 @@
 CUB-200-2011 Birds Dataset is a famous dataset for fine-grained classification 
 that contains 6k training and 6k test images of 200 species of birds, each with roughly 30 training images and 30 testing images.
 The dataset can be download in [Caltech-UCSD Webpage](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html).</br>
-The pretrained model on Imagenet can be download in [VGG19NPY](https://mega.nz/#!xZ8glS6J!MAnE91ND_WyfZ_8mvkuSa2YcA7q-1ehfSm-Q1fxOvvs.html)
+The pretrained model on Imagenet can be download in [VGG19NPY](https://mega.nz/#!xZ8glS6J!MAnE91ND_WyfZ_8mvkuSa2YcA7q-1ehfSm-Q1fxOvvs)
 In this repository, I train a pretrained VGG model in tensorflow and the accuracy is reached `77.4%`.
 
 ## Requirements

@@ -162,7 +162,7 @@ def Vgg19(rgb, y):
 
 #save checkpoint and restore
 def save_checkpoint(sess,step,saver):
-    checkpoint_dir = FLAGS.save_dir
+    checkpoint_dir = FLAGS.checkpoint_dir
     if not os.path.exists(checkpoint_dir):
         os.mkdir(checkpoint_dir)
     saver.save(sess=sess,
@@ -171,7 +171,7 @@ def save_checkpoint(sess,step,saver):
     print('step:%d | save model success'%step)
 
 def load_checkpoint(sess,saver):
-    checkpoint_dir = FLAGS.save_dir
+    checkpoint_dir = FLAGS.checkpoint_dir
     checkpoints = tf.train.get_checkpoint_state(checkpoint_dir)
     if checkpoints and checkpoints.model_checkpoint_path:
         checkpoints_name = os.path.basename(checkpoints.model_checkpoint_path)

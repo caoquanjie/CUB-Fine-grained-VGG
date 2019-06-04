@@ -10,7 +10,7 @@ flags.DEFINE_float("learning_rate1", 1e-3, "Learning rate for first only fc laye
 flags.DEFINE_float("learning_rate2", 1e-3, "Learning rate for first train step of full layers")
 flags.DEFINE_float("learning_rate3", 1e-4, "Learning rate for second train step  of full layers")
 flags.DEFINE_float("learning_rate4", 1e-5, "Learning rate for third train step of full layers")
-flags.DEFINE_integer("total_step", 50000, "batch size for training the model")
+flags.DEFINE_integer("total_step", 50000, "total step to train the model")
 flags.DEFINE_string("checkpoint_dir", 'models/','path to save model parameters')
 flags.DEFINE_string("data_dir", './dataset/','path to save tfrecords data')
 tf.app.flags.DEFINE_integer('seed', 2, "initial random seed")

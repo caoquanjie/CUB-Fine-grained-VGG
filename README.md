@@ -24,5 +24,5 @@ and was trained on a workstation with NVIDIA Titan X GPU and 32Gb system RAM.
 
 ## Usage
 First, after you download the dataset, run `python dataset_to_tfrecords.py` to get `train.tfrecords` and `test.tfrecords`.</br>
-Then run `python vgg_finetune.py`.
+Then run `python vgg_finetune.py --batch_size 32 --learning_rate1 1e-3 --learning_rate2 1e-3 --learning_rate3 1e-4 --learning_rate4 1e-5 --data_dir your dir`.
 

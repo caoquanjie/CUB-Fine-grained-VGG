@@ -4,10 +4,18 @@ import globalvar as Glovar
 from utils import *
 import logging
 
-#hyp
-batch_size = 32
-total_step = 50000
-save_dir = 'save/'
+flags = tf.app.flags
+flags.DEFINE_integer("batch_size", 32, "batch size for training the model")
+flags.DEFINE_float("learning_rate1", 1e-3, "Learning rate for first only fc layer")
+flags.DEFINE_float("learning_rate2", 1e-3, "Learning rate for first train step of full layers")
+flags.DEFINE_float("learning_rate3", 1e-4, "Learning rate for second train step  of full layers")
+flags.DEFINE_float("learning_rate4", 1e-5, "Learning rate for third train step of full layers")
+flags.DEFINE_integer("total_step", 50000, "batch size for training the model")
+flags.DEFINE_string("checkpoint_dir", 'models/','path to save model parameters')
+flags.DEFINE_string("data_dir", './dataset/','path to save tfrecords data')
+tf.app.flags.DEFINE_integer('seed', 2, "initial random seed")
+
+FLAGS = flags.FLAGS
 
 #set placeholder
 phase = tf.placeholder(tf.bool)
@@ -19,9 +27,6 @@ keep_prob = tf.placeholder(tf.float32)
 if Glovar.get_para() is None:
     Glovar.set_para()
 vgg_para = Glovar.get_para()
-
-FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_integer('seed', 2, "initial random seed")
 
 # log info
 def set_log_info():
@@ -58,8 +63,6 @@ load variable from npy to build the VGG
 
 
 def Vgg19(rgb, y):
-    lr_start = 1e-3
-    lr_min = 1e-4
     win_size = 224
     image = tf.image.resize_images(rgb, [win_size, win_size])
     #image = rgb
@@ -140,10 +143,10 @@ def Vgg19(rgb, y):
     #var_list_else = [var for var in var_list
     #                    if 'fc8' not in var.name]
 
-    fc8_train_op = tf.train.GradientDescentOptimizer(learning_rate=1e-3).minimize(loss,var_list= var_list_fc8,global_step=global_step)
-    full_train_op1 = tf.train.GradientDescentOptimizer(learning_rate=1e-3).minimize(loss,global_step=global_step)
-    full_train_op2 = tf.train.GradientDescentOptimizer(learning_rate=1e-4).minimize(loss,global_step=global_step)
-    full_train_op3 = tf.train.GradientDescentOptimizer(learning_rate=1e-5).minimize(loss,global_step=global_step)
+    fc8_train_op = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.learning_rate1).minimize(loss,var_list= var_list_fc8,global_step=global_step)
+    full_train_op1 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.learning_rate2).minimize(loss,global_step=global_step)
+    full_train_op2 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.learning_rate3).minimize(loss,global_step=global_step)
+    full_train_op3 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.learning_rate4).minimize(loss,global_step=global_step)
     #train_op = tf.group(train_op_fc8,train_op_fc67)
 
 
@@ -159,7 +162,7 @@ def Vgg19(rgb, y):
 
 #save checkpoint and restore
 def save_checkpoint(sess,step,saver):
-    checkpoint_dir = save_dir
+    checkpoint_dir = FLAGS.save_dir
     if not os.path.exists(checkpoint_dir):
         os.mkdir(checkpoint_dir)
     saver.save(sess=sess,
@@ -168,7 +171,7 @@ def save_checkpoint(sess,step,saver):
     print('step:%d | save model success'%step)
 
 def load_checkpoint(sess,saver):
-    checkpoint_dir = save_dir
+    checkpoint_dir = FLAGS.save_dir
     checkpoints = tf.train.get_checkpoint_state(checkpoint_dir)
     if checkpoints and checkpoints.model_checkpoint_path:
         checkpoints_name = os.path.basename(checkpoints.model_checkpoint_path)
@@ -183,9 +186,9 @@ def load_checkpoint(sess,saver):
 
 
 
-train_images, train_labels = input('/mnt/data/cqj/singvgg/train.tfrecords', batchsize=batch_size, isShuffel=True,
+train_images, train_labels = input(FLAGS.data_dir + 'train.tfrecords', batchsize=FLAGS.batch_size, isShuffel=True,
                                    flag=True)
-test_images, test_labels = input('/mnt/data/cqj/singvgg/test.tfrecords', batchsize=batch_size, isShuffel=True,
+test_images, test_labels = input(FLAGS.data_dir + 'test.tfrecords', batchsize=FLAGS.batch_size, isShuffel=True,
                                  flag=False)
 
 X_input = tf.cond(phase, lambda: train_images, lambda: test_images)
@@ -213,7 +216,7 @@ with tf.Session() as sess:
 
 
 
-    for i in range(total_step):
+    for i in range(FLAGS.total_step):
 
         if i <=5000:
             result = sess.run([global_step,prob_extract, loss,lossXent,lossL2, softmax, fc8_train_op, acc],
@@ -252,7 +255,7 @@ with tf.Session() as sess:
             # equality = np.equal(prediction, label_eval)
             # accuracy = np.mean(tf.cast(equality, tf.float32))
             # print('eval_acc:', result[-1])
-            eval_num = 6000 // batch_size
+            eval_num = 6000 // FLAGS.batch_size
             total_accuracy = 0
             for k in range(eval_num):
                 result = sess.run([global_step,prob_extract, loss, softmax, acc], feed_dict={phase: False,keep_prob:1.0})
